@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Havainnoijat — {{ taxon_id }}, {{ year }}{% endblock %}
+{% block content %}
+  <nav class="breadcrumb">
+    <a href="{{ url_for('main.index') }}">Etusivu</a>
+    <span aria-hidden="true"> / </span>
+    <span>Havainnoijat</span>
+  </nav>
+  <h1>Havainnoijat ja lajimäärät</h1>
+  <p class="meta">
+    Taksoni: <code>{{ taxon_id }}</code> · Vuosi: <strong>{{ year }}</strong>
+    {% if total is not none %}
+      · Havaintoerien kokonaismäärä (rajauksella): <strong>{{ total }}</strong>
+    {% endif %}
+  </p>
+  {% if error %}
+    <p class="api-error" role="alert">{{ error }}</p>
+  {% endif %}
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Havainnoija</th>
+          <th scope="col" class="numeric">Lajeja</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td>{{ row.name }}</td>
+            <td class="numeric">{{ row.species_count }}</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="2" class="empty-cell">Ei rivejä näytettäväksi.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

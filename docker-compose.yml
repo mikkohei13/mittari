@@ -10,4 +10,4 @@ services:
     volumes:
       - ./:/opt/app-root/src
     command: >
-      sh -c "gunicorn --reload --bind 0.0.0.0:${PORT:-8080} --workers 1 app:app"
+      sh -c "gunicorn --reload --bind 0.0.0.0:${PORT:-8080} --workers 1 wsgi:app"
