@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Havainnoijat — {{ taxon_id }}, {{ year }}{% endblock %}
+{% block title %}Havainnoijat — {{ taxon_id }}{% if year is not none %}, {{ year }}{% endif %}{% endblock %}
 {% block content %}
   <nav class="breadcrumb">
     <a href="{{ url_for('main.index') }}">Etusivu</a>
@@ -8,10 +8,8 @@
   </nav>
   <h1>Havainnoijat ja lajimäärät</h1>
   <p class="meta">
-    Taksoni: <code>{{ taxon_id }}</code> · Vuosi: <strong>{{ year }}</strong>
-    {% if total is not none %}
-      · Havaintoerien kokonaismäärä (rajauksella): <strong>{{ total }}</strong>
-    {% endif %}
+    Taksoni: <code>{{ taxon_id }}</code> · Aikaväli:
+    <strong>{% if year is not none %}{{ year }}{% else %}Kaikki vuodet{% endif %}</strong>
   </p>
   {% if error %}
     <p class="api-error" role="alert">{{ error }}</p>

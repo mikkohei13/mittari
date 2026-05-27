@@ -9,7 +9,6 @@ from app.services.finbif_client import FinbifApiError, get_json
 _API_BASE = "https://api.laji.fi/warehouse/query/unit/aggregate"
 
 DEFAULT_TAXON_ID = "MX.37600"
-DEFAULT_YEAR = 2026
 
 
 def _taxon_id_param(taxon_id: str) -> str:
@@ -52,13 +51,15 @@ def _fetch_aggregate(*, taxon_id: str, year: int | None) -> dict:
     return get_json(url)
 
 
-def get_observer_taxa_stats(taxon_id: str, year: int) -> dict[str, object]:
-    """Return ranked observers for the given taxon and calendar year.
+def get_observer_taxa_stats(taxon_id: str, year: int | None) -> dict[str, object]:
+    """Return ranked observers for the given taxon, optionally for one calendar year.
+
+    If ``year`` is ``None``, the FinBIF query omits ``time`` (all years).
 
     Returns a dict with ``rows`` (list of ``name`` / ``species_count``),
     optional ``total`` from the API, and optional ``error`` (Finnish message).
     """
-    if year < 1500:
+    if year is not None and year < 1500:
         return {
             "rows": [],
             "total": 0,
@@ -78,6 +79,8 @@ def get_observer_taxa_stats(taxon_id: str, year: int) -> dict[str, object]:
         for r in results
         if isinstance(r.get("taxonCount"), (int, float))
     ]
+
+    # Since the API sorts results based on taxon count, not species count, we need to filter out the results with less than the minimum taxon count. Otherwise someone with less species might be included even when someone with more species but with less taxa are not on the first page of API results.
     if taxon_counts:
         min_taxon = min(taxon_counts)
         filtered = [r for r in results if r.get("speciesCount", 0) >= min_taxon]
@@ -97,14 +100,7 @@ def get_observer_taxa_stats(taxon_id: str, year: int) -> dict[str, object]:
                 scount = 0
         rows.append({"name": str(name), "species_count": scount})
 
-    total_out: int | None
-    if isinstance(total, (int, float)):
-        total_out = int(total)
-    else:
-        total_out = None
-
     return {
         "rows": rows,
-        "total": total_out,
         "error": None,
     }

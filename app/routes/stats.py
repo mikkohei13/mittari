@@ -6,7 +6,8 @@ bp = Blueprint("stats", __name__, url_prefix="/stats")
 
 
 @bp.route("/observers/taxa/<taxon_id>/<int:year>")
-def observers_taxa_page(taxon_id: str, year: int):
+@bp.route("/observers/taxa/<taxon_id>", defaults={"year": None})
+def observers_taxa_page(taxon_id: str, year: int | None):
     result = observers_taxa.get_observer_taxa_stats(taxon_id=taxon_id, year=year)
     return render_template(
         "stats/observers_taxa.html",

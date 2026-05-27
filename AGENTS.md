@@ -1,8 +1,12 @@
 
 
-The purpose of this web app is to test new kind of statistics and visualizations before they are implemented into a production system. Keep it simple but expandable.
+The purpose of this web app is to test new kind of statistics and visualizations before they are implemented into a production system.
 
-The app app is maintained by a single person. 
+Keep the app simple. Don't implement features that are not requested.
+
+Avoid extensive error handling.
+
+No fallback logic.
 
 The app is run locally with Docker and Docker Compose. Running it with plain Python will fail, so don't try that.
 
