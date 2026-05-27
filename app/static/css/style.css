@@ -173,3 +173,98 @@ a:hover {
   font-variant-numeric: tabular-nums;
   width: 6rem;
 }
+
+.taxon-nav-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin: 0 0 1.25rem;
+}
+
+.taxon-nav-form__submit {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.taxon-nav-form__submit:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.taxon-select {
+  position: relative;
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.taxon-select__label {
+  display: block;
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.taxon-select__query {
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.taxon-select__query:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.taxon-select__suggestions {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin: 0.2rem 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 14rem;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+}
+
+.taxon-select__suggestion {
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.taxon-select__suggestion:last-child {
+  border-bottom: none;
+}
+
+.taxon-select__suggestion button {
+  display: block;
+  width: 100%;
+  padding: 0.45rem 0.65rem;
+  text-align: left;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.taxon-select__suggestion button:hover {
+  background: #eef3eb;
+}

@@ -8,6 +8,8 @@ Avoid extensive error handling.
 
 No fallback logic.
 
+api.laji.fi requires a token to be used. The token is stored in the .env file as LAJI_API_ACCESS_TOKEN.
+
 The app is run locally with Docker and Docker Compose. Running it with plain Python will fail, so don't try that.
 
 The production app is deployed to CSC OpenShift Rahti.

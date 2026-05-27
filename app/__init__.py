@@ -8,9 +8,10 @@ def create_app() -> Flask:
         static_folder="static",
     )
 
-    from app.routes import main_bp, stats_bp
+    from app.routes import api_bp, main_bp, stats_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(stats_bp)
+    app.register_blueprint(api_bp)
 
     return app

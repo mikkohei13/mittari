@@ -1,4 +1,9 @@
-"""Business logic: observer species counts under a taxon, from FinBIF warehouse aggregate."""
+"""Business logic: observer species counts under a taxon, from FinBIF warehouse aggregate.
+
+Taxon identifiers (e.g. ``MX.71950``) for ``taxonId`` / URL paths should be taken from
+FinBIF ``GET /autocomplete/taxa`` result objects' ``id`` field — not ``value`` or display
+strings alone.
+"""
 
 from __future__ import annotations
 
@@ -104,3 +109,5 @@ def get_observer_taxa_stats(taxon_id: str, year: int | None) -> dict[str, object
         "rows": rows,
         "error": None,
     }
+
+

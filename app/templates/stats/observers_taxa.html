@@ -7,8 +7,43 @@
     <span>Havainnoijat</span>
   </nav>
   <h1>Havainnoijat ja lajimäärät</h1>
+  <form class="taxon-nav-form" id="observers-taxa-nav" method="get" action="#">
+    <div
+      class="taxon-select"
+      data-taxon-select
+      data-autocomplete-url="{{ url_for('api.autocomplete_taxa') }}"
+    >
+      <label class="taxon-select__label" for="taxon-query">Vaihda taksoni</label>
+      <input
+        id="taxon-query"
+        class="taxon-select__query"
+        type="text"
+        name="taxon_query"
+        autocomplete="off"
+        placeholder="Kirjoita lajin nimi…"
+        value=""
+      />
+      <input type="hidden" name="taxon_id" value="{{ taxon_id }}" />
+      <ul class="taxon-select__suggestions" hidden></ul>
+    </div>
+    <button type="submit" class="taxon-nav-form__submit">Siirry</button>
+  </form>
+  <script>
+    (function () {
+      var form = document.getElementById("observers-taxa-nav");
+      if (!form) return;
+      var urlTemplate = {{ url_for('stats.observers_taxa_page', taxon_id='_TAXON_')|tojson }};
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var idInput = form.querySelector('input[name="taxon_id"]');
+        var id = idInput && idInput.value.trim();
+        if (!id) return;
+        window.location.href = urlTemplate.replace("_TAXON_", id);
+      });
+    })();
+  </script>
   <p class="meta">
-    Taksoni: <code>{{ taxon_id }}</code> · Aikaväli:
+    Taksoni: <a href="https://tun.fi/{{ taxon_id }}">{{ taxon_id }}</a> · Ajankohta:
     <strong>{% if year is not none %}{{ year }}{% else %}Kaikki vuodet{% endif %}</strong>
   </p>
   {% if error %}
@@ -18,6 +53,7 @@
     <table class="data-table">
       <thead>
         <tr>
+          <th scope="col" class="numeric">#</th>
           <th scope="col">Havainnoija</th>
           <th scope="col" class="numeric">Lajeja</th>
         </tr>
@@ -25,12 +61,13 @@
       <tbody>
         {% for row in rows %}
           <tr>
+            <td class="numeric">{{ loop.index }}</td>
             <td>{{ row.name }}</td>
             <td class="numeric">{{ row.species_count }}</td>
           </tr>
         {% else %}
           <tr>
-            <td colspan="2" class="empty-cell">Ei rivejä näytettäväksi.</td>
+            <td colspan="3" class="empty-cell">Ei rivejä näytettäväksi.</td>
           </tr>
         {% endfor %}
       </tbody>
