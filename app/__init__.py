@@ -1,4 +1,8 @@
+import os
+
 from flask import Flask
+
+from app.extensions import cache
 
 
 def create_app() -> Flask:
@@ -7,6 +11,13 @@ def create_app() -> Flask:
         template_folder="templates",
         static_folder="static",
     )
+
+    cache_dir = os.path.join(app.instance_path, "cache")
+    os.makedirs(cache_dir, exist_ok=True)
+    app.config.setdefault("CACHE_TYPE", "FileSystemCache")
+    app.config.setdefault("CACHE_DIR", cache_dir)
+    app.config.setdefault("CACHE_DEFAULT_TIMEOUT", 300)
+    cache.init_app(app)
 
     from app.routes import api_bp, main_bp, stats_bp
 

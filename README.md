@@ -35,7 +35,7 @@ The GitHub Actions workflow publishes images to:
 ghcr.io/luomus/mittari
 ```
 
-Important: pushing to `main` automatically builds and pushes a new image to GHCR, but it does **not** automatically roll out OpenShift deployment.
+Important: pushing to `main` automatically builds and pushes a new image to GHCR, but it does **not** automatically roll out OpenShift deployment. See deployment instructions below.
 
 **Tools:** `oc` is required. `./scripts/deploy-openshift.sh` also needs the [GitHub CLI](https://cli.github.com/) (`gh`) to resolve the newest `main-<sha>` tag from GHCR. For a **private** package, run `gh auth login` and authorize **`read:packages`**. If you prefer not to use `gh`, set `IMAGE_TAG` explicitly (see below).
 
