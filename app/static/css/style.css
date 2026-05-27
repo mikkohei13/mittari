@@ -268,3 +268,29 @@ a:hover {
 .taxon-select__suggestion button:hover {
   background: #eef3eb;
 }
+
+.year-select {
+  flex: 0 0 auto;
+}
+
+.year-select__label {
+  display: block;
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.year-select__control {
+  min-width: 9rem;
+  padding: 0.5rem 0.65rem;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.year-select__control:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}

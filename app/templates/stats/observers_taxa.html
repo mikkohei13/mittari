@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Havainnoijat — {{ taxon_id }}{% if year is not none %}, {{ year }}{% endif %}{% endblock %}
+{% block title %}Havainnoijat — {{ taxon_label or taxon_id }}{% if year is not none %}, {{ year }}{% endif %}{% endblock %}
 {% block content %}
   <nav class="breadcrumb">
     <a href="{{ url_for('main.index') }}">Etusivu</a>
@@ -20,11 +20,20 @@
         type="text"
         name="taxon_query"
         autocomplete="off"
-        placeholder="Kirjoita lajin nimi…"
+        placeholder="Kirjoita taksonin nimi…"
         value=""
       />
       <input type="hidden" name="taxon_id" value="{{ taxon_id }}" />
       <ul class="taxon-select__suggestions" hidden></ul>
+    </div>
+    <div
+      class="year-select"
+      data-year-select
+      data-min-year="1970"
+      data-selected-year="{% if year is not none %}{{ year }}{% endif %}"
+    >
+      <label class="year-select__label" for="observers-year">Vuosi</label>
+      <select id="observers-year" class="year-select__control" name="year"></select>
     </div>
     <button type="submit" class="taxon-nav-form__submit">Siirry</button>
   </form>
@@ -38,12 +47,22 @@
         var idInput = form.querySelector('input[name="taxon_id"]');
         var id = idInput && idInput.value.trim();
         if (!id) return;
-        window.location.href = urlTemplate.replace("_TAXON_", id);
+        var submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Ladataan…";
+        }
+        form.setAttribute("aria-busy", "true");
+        var href = urlTemplate.replace("_TAXON_", id);
+        var yearSel = form.querySelector('select[name="year"]');
+        var y = yearSel && yearSel.value.trim();
+        if (y) href = href + "/" + y;
+        window.location.href = href;
       });
     })();
   </script>
   <p class="meta">
-    Taksoni: <a href="https://tun.fi/{{ taxon_id }}">{{ taxon_id }}</a> · Ajankohta:
+    Taksoni: <a href="https://tun.fi/{{ taxon_id }}">{{ taxon_label or taxon_id }}</a> · Ajankohta:
     <strong>{% if year is not none %}{{ year }}{% else %}Kaikki vuodet{% endif %}</strong>
   </p>
   {% if error %}

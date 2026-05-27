@@ -7,11 +7,12 @@ strings alone.
 
 from __future__ import annotations
 
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 
 from app.services.finbif_client import FinbifApiError, get_json
 
 _API_BASE = "https://api.laji.fi/warehouse/query/unit/aggregate"
+_TAXA_BASE = "https://api.laji.fi/taxa"
 
 DEFAULT_TAXON_ID = "MX.37600"
 
@@ -22,6 +23,54 @@ def _taxon_id_param(taxon_id: str) -> str:
     if tid.startswith("http://") or tid.startswith("https://"):
         return tid
     return tid
+
+
+def get_taxon_display_label(taxon_id: str) -> str | None:
+    """Resolve taxon id to ``scientific name (Finnish vernacular)`` via ``GET /taxa/{id}``.
+
+    Returns ``None`` if the request fails or names are missing.
+    ``Accept-Language: fi`` is set on the HTTP client so ``vernacularName`` is Finnish when available.
+    """
+    tid = taxon_id.strip()
+    if not tid:
+        return None
+    params = {
+        "checklistVersion": "current",
+        "includeMedia": "false",
+        "includeDescriptions": "false",
+        "includeRedListEvaluations": "false",
+    }
+    path = quote(tid, safe="")
+    url = f"{_TAXA_BASE}/{path}?{urlencode(params)}"
+    try:
+        data = get_json(url)
+    except FinbifApiError:
+        return None
+
+    raw_sci = data.get("scientificName")
+    if isinstance(raw_sci, str):
+        sci = raw_sci.strip()
+    elif raw_sci is not None:
+        sci = str(raw_sci).strip()
+    else:
+        sci = ""
+
+    vern_raw = data.get("vernacularName")
+    if isinstance(vern_raw, str):
+        vern = vern_raw.strip()
+    elif isinstance(vern_raw, dict):
+        v = vern_raw.get("fi") or vern_raw.get("FI")
+        vern = str(v).strip() if v is not None else ""
+    elif vern_raw is not None:
+        vern = str(vern_raw).strip()
+    else:
+        vern = ""
+
+    if sci and vern:
+        return f"{sci} ({vern})"
+    if sci:
+        return sci
+    return None
 
 
 def _fetch_aggregate(*, taxon_id: str, year: int | None) -> dict:
