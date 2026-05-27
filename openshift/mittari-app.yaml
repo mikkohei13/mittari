@@ -1,0 +1,114 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: mittari-app
+parameters:
+  - name: NAME
+    description: Name used for OpenShift resources.
+    required: true
+    value: mittari
+  - name: APP_IMAGE
+    description: Container image to deploy.
+    required: true
+    value: ghcr.io/luomus/mittari:latest
+  - name: IMAGE_PULL_SECRET
+    description: Name of existing docker-registry pull secret for GHCR.
+    required: true
+    value: ghcr-pull-secret
+  - name: ROUTE_HOST
+    description: Public host for the OpenShift Route.
+    required: true
+    value: mittari.2.rahtiapp.fi
+  - name: ENV_SECRET_NAME
+    description: Secret containing runtime sensitive environment variables.
+    required: true
+    value: mittari-env-secret
+  - name: ENV_CONFIGMAP_NAME
+    description: ConfigMap containing runtime non-sensitive environment variables.
+    required: true
+    value: mittari-env-config
+objects:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: ${NAME}
+      labels:
+        app: ${NAME}
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: ${NAME}
+      template:
+        metadata:
+          labels:
+            app: ${NAME}
+        spec:
+          imagePullSecrets:
+            - name: ${IMAGE_PULL_SECRET}
+          containers:
+            - name: web
+              image: ${APP_IMAGE}
+              ports:
+                - containerPort: 8080
+                  name: http
+              envFrom:
+                - secretRef:
+                    name: ${ENV_SECRET_NAME}
+                - configMapRef:
+                    name: ${ENV_CONFIGMAP_NAME}
+              readinessProbe:
+                httpGet:
+                  path: /healthz
+                  port: http
+                initialDelaySeconds: 3
+                periodSeconds: 10
+              livenessProbe:
+                httpGet:
+                  path: /healthz
+                  port: http
+                initialDelaySeconds: 10
+                periodSeconds: 20
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 250m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: ${NAME}
+      labels:
+        app: ${NAME}
+    spec:
+      selector:
+        app: ${NAME}
+      ports:
+        - name: http
+          port: 8080
+          targetPort: http
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: ${NAME}
+      labels:
+        app: ${NAME}
+      annotations:
+        haproxy.router.openshift.io/hsts_header: "max-age=31536000; includeSubDomains"
+    spec:
+      host: ${ROUTE_HOST}
+      to:
+        kind: Service
+        name: ${NAME}
+      port:
+        targetPort: http
+      tls:
+        termination: edge
+        insecureEdgeTerminationPolicy: Redirect
