@@ -1,6 +1,6 @@
 # Mittari
 
-Statistics demo service.
+Observation statistics demo service.
 
 
 ## Setup
