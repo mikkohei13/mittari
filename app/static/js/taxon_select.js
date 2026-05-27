@@ -1,17 +1,17 @@
 /**
- * Reusable taxon name autocomplete (FinBIF /autocomplete/taxa via same-origin proxy).
+ * Taxon name autocomplete (FinBIF /autocomplete/taxa via same-origin proxy).
  *
- * Markup (inside a form):
  *   <div data-taxon-select data-autocomplete-url="...">
- *     <input type="text" class="taxon-select__query" autocomplete="off" />
+ *     <label for="…">…</label>
+ *     <div class="taxon-select__query-wrap">
+ *       <input type="text" class="taxon-select__query" autocomplete="off" />
+ *     </div>
  *     <input type="hidden" name="taxon_id" value="" />
  *     <ul class="taxon-select__suggestions" hidden></ul>
  *   </div>
- *
- * On pick, hidden input name="taxon_id" is set to result.id (MX-code).
  */
 (function () {
-  var DEBOUNCE_MS = 220;
+  var DEBOUNCE_MS = 300;
 
   function labelFor(item) {
     var sci = item.scientificName || item.value || item.matchingName || "";
@@ -37,21 +37,24 @@
 
     var timer = null;
     var lastController = null;
-
-    function scheduleFetch() {
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(runFetch, DEBOUNCE_MS);
-    }
+    var seq = 0;
 
     function runFetch() {
       timer = null;
       var q = queryInput.value.trim();
-      if (lastController) lastController.abort();
+      if (lastController) {
+        lastController.abort();
+        lastController = null;
+      }
       if (!q) {
+        seq++;
+        root.classList.remove("taxon-select--loading");
         closeList(ul);
         return;
       }
 
+      var mySeq = ++seq;
+      root.classList.add("taxon-select--loading");
       lastController = new AbortController();
       var params = new URLSearchParams({ query: q });
       fetch(endpoint + "?" + params.toString(), {
@@ -59,9 +62,11 @@
         headers: { Accept: "application/json" },
       })
         .then(function (res) {
+          if (!res.ok) throw new Error("http");
           return res.json();
         })
         .then(function (data) {
+          if (mySeq !== seq) return;
           var results = data.results;
           if (!Array.isArray(results) || results.length === 0) {
             closeList(ul);
@@ -87,13 +92,18 @@
           ul.hidden = ul.childElementCount === 0;
         })
         .catch(function (err) {
-          if (err.name === "AbortError") return;
+          if (err.name === "AbortError" || mySeq !== seq) return;
           closeList(ul);
+        })
+        .finally(function () {
+          if (mySeq !== seq) return;
+          root.classList.remove("taxon-select--loading");
         });
     }
 
     queryInput.addEventListener("input", function () {
-      scheduleFetch();
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(runFetch, DEBOUNCE_MS);
     });
 
     queryInput.addEventListener("focus", function () {

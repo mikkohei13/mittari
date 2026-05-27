@@ -1,41 +1,42 @@
 {% extends "base.html" %}
 {% block title %}Havainnoijat — {{ taxon_label or taxon_id }}{% if year is not none %}, {{ year }}{% endif %}{% endblock %}
 {% block content %}
-  <nav class="breadcrumb">
+  <nav aria-label="Sivupolku">
     <a href="{{ url_for('main.index') }}">Etusivu</a>
     <span aria-hidden="true"> / </span>
     <span>Havainnoijat</span>
   </nav>
   <h1>Havainnoijat ja lajimäärät</h1>
-  <form class="taxon-nav-form" id="observers-taxa-nav" method="get" action="#">
+  <p>Eniten Suomessa lajeja havainneet. Mukana ei ole ei-luonnonvaraisia, epävarmoja tai virheellisiä havaintoja, eikä nollahavaintoja. Taulukko päivittyy kerran vuorokaudessa.</p>
+  <form id="observers-taxa-nav" method="get" action="#">
     <div
-      class="taxon-select"
       data-taxon-select
       data-autocomplete-url="{{ url_for('api.autocomplete_taxa') }}"
     >
-      <label class="taxon-select__label" for="taxon-query">Vaihda taksoni</label>
-      <input
-        id="taxon-query"
-        class="taxon-select__query"
-        type="text"
-        name="taxon_query"
-        autocomplete="off"
-        placeholder="Kirjoita taksonin nimi…"
-        value=""
-      />
+      <h4><label for="taxon-query">Vaihda taksoni</label></h4>
+      <div class="taxon-select__query-wrap">
+        <input
+          id="taxon-query"
+          class="taxon-select__query"
+          type="text"
+          name="taxon_query"
+          autocomplete="off"
+          placeholder="Kirjoita taksonin nimi…"
+          value=""
+        />
+      </div>
       <input type="hidden" name="taxon_id" value="{{ taxon_id }}" />
       <ul class="taxon-select__suggestions" hidden></ul>
     </div>
     <div
-      class="year-select"
       data-year-select
       data-min-year="1970"
       data-selected-year="{% if year is not none %}{{ year }}{% endif %}"
     >
-      <label class="year-select__label" for="observers-year">Vuosi</label>
-      <select id="observers-year" class="year-select__control" name="year"></select>
+      <h4><label for="observers-year">Vuosi</label></h4>
+      <select id="observers-year" name="year"></select>
     </div>
-    <button type="submit" class="taxon-nav-form__submit">Siirry</button>
+    <button type="submit">Siirry</button>
   </form>
   <script>
     (function () {
@@ -61,32 +62,32 @@
       });
     })();
   </script>
-  <p class="meta">
+  <p>
     Taksoni: <a href="https://tun.fi/{{ taxon_id }}">{{ taxon_label or taxon_id }}</a> · Ajankohta:
     <strong>{% if year is not none %}{{ year }}{% else %}Kaikki vuodet{% endif %}</strong>
   </p>
   {% if error %}
-    <p class="api-error" role="alert">{{ error }}</p>
+    <p role="alert">{{ error }}</p>
   {% endif %}
-  <div class="table-wrap">
-    <table class="data-table">
+  <div>
+    <table>
       <thead>
         <tr>
-          <th scope="col" class="numeric">#</th>
+          <th scope="col">#</th>
           <th scope="col">Havainnoija</th>
-          <th scope="col" class="numeric">Lajeja</th>
+          <th scope="col">Lajeja</th>
         </tr>
       </thead>
       <tbody>
         {% for row in rows %}
           <tr>
-            <td class="numeric">{{ loop.index }}</td>
+            <td>{{ loop.index }}</td>
             <td>{{ row.name }}</td>
-            <td class="numeric">{{ row.species_count }}</td>
+            <td >{{ row.species_count }}</td>
           </tr>
         {% else %}
           <tr>
-            <td colspan="3" class="empty-cell">Ei rivejä näytettäväksi.</td>
+            <td colspan="3">Ei rivejä näytettäväksi.</td>
           </tr>
         {% endfor %}
       </tbody>

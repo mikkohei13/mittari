@@ -5,6 +5,8 @@ FinBIF ``GET /autocomplete/taxa`` result objects' ``id`` field — not ``value``
 strings alone.
 """
 
+
+
 from __future__ import annotations
 
 from urllib.parse import quote, urlencode
@@ -23,7 +25,6 @@ def _taxon_id_param(taxon_id: str) -> str:
     if tid.startswith("http://") or tid.startswith("https://"):
         return tid
     return tid
-
 
 def get_taxon_display_label(taxon_id: str) -> str | None:
     """Resolve taxon id to ``scientific name (Finnish vernacular)`` via ``GET /taxa/{id}``.

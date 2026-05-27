@@ -7,10 +7,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
   </head>
   <body>
-    <header class="site-header">
-      <a class="site-logo" href="{{ url_for('main.index') }}">Mittari - Kokeilukäytössä olevia tilastointeja</a>
+    <header>
+      <a href="{{ url_for('main.index') }}">Mittari - Kokeilukäytössä olevia tilastointeja</a>
     </header>
-    <main class="site-main">{% block content %}{% endblock %}</main>
+    <main>{% block content %}{% endblock %}</main>
     <script defer src="{{ url_for('static', filename='js/taxon_select.js') }}"></script>
     <script defer src="{{ url_for('static', filename='js/year_select.js') }}"></script>
     {% block scripts %}{% endblock %}

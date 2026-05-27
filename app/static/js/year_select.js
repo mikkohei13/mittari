@@ -2,8 +2,8 @@
  * Year dropdown: 1970 … current year, plus "Kaikki vuodet" (empty value).
  *
  *   <div data-year-select data-selected-year="2020" data-min-year="1970">
- *     <label class="year-select__label" for="y">Vuosi</label>
- *     <select id="y" class="year-select__control" name="year"></select>
+ *     <label for="y">Vuosi</label>
+ *     <select id="y" name="year"></select>
  *   </div>
  *
  * Optional: data-max-year (defaults to calendar year in the browser).
@@ -12,7 +12,7 @@
   var DEFAULT_MIN = 1970;
 
   function init(root) {
-    var sel = root.querySelector("select.year-select__control");
+    var sel = root.querySelector("select[name='year']");
     if (!sel) return;
 
     var maxY = parseInt(root.getAttribute("data-max-year"), 10);
